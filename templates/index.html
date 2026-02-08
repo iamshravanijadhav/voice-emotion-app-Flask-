@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Emotion AI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    padding:30px;
+    border-radius:15px;
+    width:90%;
+    max-width:500px;
+    text-align:center;
+    box-shadow:0 8px 32px rgba(0,0,0,0.2);
+}
+
+h1{
+    margin-bottom:10px;
+}
+
+.upload-box{
+    border:2px dashed white;
+    padding:20px;
+    border-radius:10px;
+    cursor:pointer;
+    margin:15px 0;
+}
+
+button{
+    background:#ffcc00;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+#loading{
+    display:none;
+    margin-top:10px;
+}
+
+.badge{
+    padding:8px 15px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.joy{background:#00c853;}
+.sadness{background:#2979ff;}
+.anger{background:#d50000;}
+.fear{background:#aa00ff;}
+.love{background:#ff4081;}
+.surprise{background:#ff6d00;}
+
+canvas{
+    margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🎤 Voice Emotion AI</h1>
+    <p>Analyze emotions from voice</p>
+
+    <input type="file" id="audio" hidden>
+
+    <div class="upload-box" onclick="document.getElementById('audio').click()">
+        📂 Click to Upload Audio
+    </div>
+
+    <button onclick="send()">Analyze Emotion</button>
+
+    <div id="loading">Analyzing... ⏳</div>
+
+    <h2 id="result"></h2>
+
+    <canvas id="chart"></canvas>
+</div>
+
+<script>
+async function send(){
+    let file = document.getElementById("audio").files[0]
+
+    if(!file){
+        alert("Please upload audio")
+        return
+    }
+
+    document.getElementById("loading").style.display="block"
+
+    let fd = new FormData()
+    fd.append("audio", file)
+
+    let res = await fetch("/analyze",{
+        method:"POST",
+        body:fd
+    })
+
+    let data = await res.json()
+
+    document.getElementById("loading").style.display="none"
+
+    let emotion = data.emotion.toLowerCase()
+
+    document.getElementById("result").innerHTML =
+        `Emotion: <span class="badge ${emotion}">${emotion}</span>`
+
+    new Chart(document.getElementById("chart"),{
+        type:"doughnut",
+        data:{
+            labels:[emotion],
+            datasets:[{
+                data:[100]
+            }]
+        }
+    })
+}
+</script>
+
+</body>
+</html>
