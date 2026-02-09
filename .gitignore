@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# ML / Torch
+*.pt
+*.pth
+*.dll
+*.so
+
+# Builds / zips
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
