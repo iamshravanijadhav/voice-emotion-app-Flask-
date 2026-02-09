@@ -1,143 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voice Emotion AI</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-
-.container{
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(12px);
-    padding:30px;
-    border-radius:15px;
-    width:90%;
-    max-width:500px;
-    text-align:center;
-    box-shadow:0 8px 32px rgba(0,0,0,0.2);
-}
-
-h1{
-    margin-bottom:10px;
-}
-
-.upload-box{
-    border:2px dashed white;
-    padding:20px;
-    border-radius:10px;
-    cursor:pointer;
-    margin:15px 0;
-}
-
-button{
-    background:#ffcc00;
-    border:none;
-    padding:12px 20px;
-    border-radius:8px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-#loading{
-    display:none;
-    margin-top:10px;
-}
-
-.badge{
-    padding:8px 15px;
-    border-radius:20px;
-    font-weight:bold;
-}
-
-.joy{background:#00c853;}
-.sadness{background:#2979ff;}
-.anger{background:#d50000;}
-.fear{background:#aa00ff;}
-.love{background:#ff4081;}
-.surprise{background:#ff6d00;}
-
-canvas{
-    margin-top:20px;
-}
-</style>
+    <title>Voice Emotion Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
 <div class="container">
-    <h1>🎤 Voice Emotion AI</h1>
-    <p>Analyze emotions from voice</p>
 
-    <input type="file" id="audio" hidden>
+    <h1>🎤 Voice Emotion Analysis</h1>
+    <p class="subtitle">Upload or Record your voice to detect emotion</p>
 
-    <div class="upload-box" onclick="document.getElementById('audio').click()">
-        📂 Click to Upload Audio
+    <!-- Upload Card -->
+    <!-- <div class="card">
+        <h2>Upload Audio</h2>
+
+        <div class="file-upload-wrapper">
+            <input type="file" id="fileInput" accept="audio/*" onchange="displayFileName()">
+            <label for="fileInput" class="file-upload-label">Choose Audio File</label>
+            <div class="file-name-display" id="fileName"></div>
+        </div>
+
+        <button onclick="uploadAudio()">Upload & Analyze</button>
+    </div> -->
+
+    <!-- Record Card -->
+    <div class="card">
+        <h2>Record Voice</h2>
+
+        <button onclick="startRecording()">🎙 Start</button>
+        <button onclick="stopRecording()">⏹ Stop</button>
     </div>
 
-    <button onclick="send()">Analyze Emotion</button>
+    <div id="result">📝 Text will appear here...</div>
 
-    <div id="loading">Analyzing... ⏳</div>
+    <!-- Modern Dashboard Section -->
+    <div class="dashboard-section">
+        <h2 class="dashboard-title">📊 Emotion Analysis Dashboard</h2>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="totalSamples">0</div>
+                <div class="stat-label">Total Samples</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😊</div>
+                <div class="stat-value" id="happyCount">0</div>
+                <div class="stat-label">Happy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😢</div>
+                <div class="stat-value" id="sadCount">0</div>
+                <div class="stat-label">Sad</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😡</div>
+                <div class="stat-value" id="angryCount">0</div>
+                <div class="stat-label">Angry</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🤩</div>
+                <div class="stat-value" id="excitedCount">0</div>
+                <div class="stat-label">Excited</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😕</div>
+                <div class="stat-value" id="confusedCount">0</div>
+                <div class="stat-label">Confused</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😨</div>
+                <div class="stat-value" id="scaredCount">0</div>
+                <div class="stat-label">Scared</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😌</div>
+                <div class="stat-value" id="calmCount">0</div>
+                <div class="stat-label">Calm</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😲</div>
+                <div class="stat-value" id="surprisedCount">0</div>
+                <div class="stat-label">Surprised</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">😐</div>
+                <div class="stat-value" id="neutralCount">0</div>
+                <div class="stat-label">Neutral</div>
+            </div>
+        </div>
 
-    <h2 id="result"></h2>
+        <!-- Modern Table -->
+        <div class="table-container">
+            <table id="historyTable" class="modern-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>⏰ Timestamp</th>
+                        <th>⏱️ Duration</th>
+                        <th>💬 Transcribed Text</th>
+                        <th>😊 Emotion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">🎤</div>
+                <p>No voice samples yet. Start recording to see data!</p>
+            </div>
+        </div>
+    </div>
 
-    <canvas id="chart"></canvas>
 </div>
 
-<script>
-async function send(){
-    let file = document.getElementById("audio").files[0]
-
-    if(!file){
-        alert("Please upload audio")
-        return
-    }
-
-    document.getElementById("loading").style.display="block"
-
-    let fd = new FormData()
-    fd.append("audio", file)
-
-    let res = await fetch("/analyze",{
-        method:"POST",
-        body:fd
-    })
-
-    let data = await res.json()
-
-    document.getElementById("loading").style.display="none"
-
-    let emotion = data.emotion.toLowerCase()
-
-    document.getElementById("result").innerHTML =
-        `Emotion: <span class="badge ${emotion}">${emotion}</span>`
-
-    new Chart(document.getElementById("chart"),{
-        type:"doughnut",
-        data:{
-            labels:[emotion],
-            datasets:[{
-                data:[100]
-            }]
-        }
-    })
-}
-</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>

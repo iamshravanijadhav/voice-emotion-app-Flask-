@@ -1,6 +1,3 @@
-flask
-transformers
-torch
-SpeechRecognition
-pydub
+Flask
 gunicorn
+Werkzeug
