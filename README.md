@@ -41,14 +41,6 @@ Click **Start** to begin recording and **Stop** when you are finished to know yo
 
 ---
 
-### 📁 Upload Audio
-
-1. Select an audio file (mp3, wav, ogg, m4a, webm)
-2. Click upload
-3. The app logs the emotion result in the dashboard
-
----
-
 ## 🛠️ Tech Stack
 
 - **Flask (Python)** – Backend server & API handling
